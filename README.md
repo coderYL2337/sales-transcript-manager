@@ -1,4 +1,4 @@
-Sales Transcript Manager is a powerful tool designed to help sales teams analyze, annotate, and summarize sales call transcripts. It provides an intuitive interface for adding comments to specific parts of a transcript, attaching files to comments, and generating summaries using AI.
+Sales Transcript Manager is a powerful tool designed for Rilly to help sales teams analyze, annotate, and summarize sales call transcripts. It provides an intuitive interface for adding comments to specific parts of a transcript, attaching files to comments, and generating summaries using AI.
 ##Main Features
 
 View and navigate through sales call transcripts
