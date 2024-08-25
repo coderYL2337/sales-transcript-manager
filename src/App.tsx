@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import './App.css';
 import Transcript from './components/Transcript';
 
-const App: React.FC = () => {
+function App() {
+  const transcriptRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTranscript = () => {
+    transcriptRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="App">
-      <h1>Sales Transcript Manager</h1>
-      <Transcript />
+      <header className="App-header">
+        <h1>Rilla - The end of Ridealongs</h1>
+        <button className="try-now-button" onClick={scrollToTranscript}>Try Now</button>
+      </header>
+      <div className="yellow-line"></div>
+      <div ref={transcriptRef}>
+        <Transcript />
+      </div>
     </div>
   );
-};
+}
 
 export default App;
 

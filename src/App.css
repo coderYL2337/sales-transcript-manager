@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -14,18 +15,19 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #03050C;
+  /* background: linear-gradient(to bottom, #000000, #241F38); */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #FEF400;
 }
 
 .App-link {
-  color: #61dafb;
+  color: #FEF400;
 }
 
 @keyframes App-logo-spin {
@@ -36,3 +38,162 @@
     transform: rotate(360deg);
   }
 }
+
+/* Horizontal yellow line */
+.yellow-line {
+  width: 100%;
+  height: 2px;
+  background-color: #FEF400;
+  margin-bottom: 0;
+}
+
+/* Try Now button */
+.try-now-button {
+  background-color: #FEF400;
+  color: #03050C;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+/* New styles for Transcript component */
+.transcript-container {
+  display: flex;
+  height: calc(100vh - 60px); /* Adjust based on your App header height */
+  font-family: Arial, sans-serif;
+  text-align: left;
+}
+
+.transcript-content {
+  flex: 2;
+  padding: 20px;
+  position: relative;
+  overflow-y: auto;
+  background: linear-gradient(to bottom, #000000, #241F38);
+  color: white;
+}
+
+.transcript-content h3 {
+  color: #FEF400;
+}
+
+.transcript-content p {
+  margin-bottom: 10px;
+}
+
+.comments-sidebar {
+  flex: 1;
+  padding: 20px;
+  /* background-color: #333334; */
+  background-color: #1a1b22;
+  overflow-y: auto;
+}
+
+.comments-sidebar h3 {
+  color: #FEF400;
+}
+
+.summary-section {
+  padding: 20px;
+  /* background-color: #282829; */
+  background-color: #17171A;
+  color: #FFFFFF;
+}
+
+.summary-section h3 {
+  color: #FEF400;
+} 
+
+.highlighted-text {
+  background-color: rgb(194, 193, 193); 
+}
+
+.comment {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.comment::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.comment.active {
+  border-color: #FEF400;
+}
+
+.comment-actions {
+  margin-top: 10px;
+}
+
+.comment-actions textarea {
+  width: 95%;
+  min-height: 60px;
+  margin-bottom: 10px;
+  padding: 5px;
+  resize: vertical;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label, .delete-button {
+  background-color: #FEF400;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 15px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.file-label:hover, .delete-button:hover {
+  background-color: #FEF400;
+}
+
+.attachment-info {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.add-comment-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #FEF400;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 15px; 
+  
+}
+
