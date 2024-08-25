@@ -1,11 +1,51 @@
-# Getting Started with Create React App
+Sales Transcript Manager is a powerful tool designed to help sales teams analyze, annotate, and summarize sales call transcripts. It provides an intuitive interface for adding comments to specific parts of a transcript, attaching files to comments, and generating summaries using AI.
+##Main Features
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+View and navigate through sales call transcripts
+Add, edit, and delete comments on specific parts of the transcript
+Attach files to comments for additional context
+AI-powered summary generation of the transcript and its comments
+Intuitive user interface with a three-column layout: Transcript, Comments, and Summary
 
-## Available Scripts
+##Technologies Used
+##Frontend
 
-In the project directory, you can run:
+React.js
+TypeScript
+CSS3
 
+##Backend
+
+Node.js with AWS Lambda for handling CRUD operations for comments and file attachments
+Integration with an LLM (Language Learning Model) to generate summaries
+
+##Database
+
+Amazon DynamoDB for storing comments and metadata
+Amazon S3 for storing attached files
+Integration with an LLM for summarizing the transcript
+
+##Installation
+To set up the project locally, follow these steps:
+
+Clone the repository:
+###'git clone https://github.com/coderYL2337/sales-transcript-manager.git'
+
+Navigate to the project directory:
+###'cd sales-transcript-manager'
+
+Install the dependencies:
+###'npm install'
+
+
+##Running the Application
+To start the development server, run:
+###'npm start'
+This will start the application on http://localhost:3000.
+Building for Production
+To create a production build, run:
+### 'npm run build'
+This will create a build directory with optimized production-ready files.
 ### `npm start`
 
 Runs the app in the development mode.\
