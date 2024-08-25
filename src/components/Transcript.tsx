@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import './MockTranscriptApi';
+import './mockTranscriptApi.ts';
+
 interface Comment {
   id: string;
   text: string;
-  timestamp: number;
+  startIndex: number;
+  endIndex: number;
   fileAttachment?: File;
 }
 
@@ -19,10 +22,18 @@ const Transcript: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [summary, setSummary] = useState<string>('');
   const [selectedText, setSelectedText] = useState<string>('');
-  const [selectedTimestamp, setSelectedTimestamp] = useState<number | null>(null);
+  const [selectedRange, setSelectedRange] = useState<{start: number, end: number} | null>(null);
+  const [showCommentButton, setShowCommentButton] = useState(false);
+  const [activeComment, setActiveComment] = useState<string | null>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
+  const commentButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     fetchTranscript();
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -60,22 +71,28 @@ const Transcript: React.FC = () => {
     if (selection && selection.toString().length > 0) {
       setSelectedText(selection.toString());
       const range = selection.getRangeAt(0);
-      const startNode = range.startContainer.parentElement;
-      if (startNode) {
-        const timestamp = Number(startNode.getAttribute('data-timestamp'));
-        setSelectedTimestamp(timestamp);
-      }
+      setSelectedRange({
+        start: range.startOffset,
+        end: range.endOffset
+      });
+      setShowCommentButton(true);
+    } else {
+      setShowCommentButton(false);
     }
   };
 
-  const handleAddComment = (text: string, timestamp: number, file?: File) => {
-    const newComment: Comment = {
-      id: uuidv4(),
-      text,
-      timestamp,
-      fileAttachment: file,
-    };
-    setComments([...comments, newComment]);
+  const handleAddComment = () => {
+    if (selectedText && selectedRange) {
+      const newComment: Comment = {
+        id: uuidv4(),
+        text: '',
+        startIndex: selectedRange.start,
+        endIndex: selectedRange.end,
+      };
+      setComments([...comments, newComment]);
+      setActiveComment(newComment.id);
+      setShowCommentButton(false);
+    }
   };
 
   const handleEditComment = (id: string, text: string, file?: File) => {
@@ -88,67 +105,103 @@ const Transcript: React.FC = () => {
   const handleDeleteComment = (id: string) => {
     const updatedComments = comments.filter(comment => comment.id !== id);
     setComments(updatedComments);
+    setActiveComment(null);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (activeComment && !((event.target as HTMLElement).closest('.comment'))) {
+      setActiveComment(null);
+    }
+  };
+
+  const highlightText = (startIndex: number, endIndex: number) => {
+    const transcriptText = transcript.map(line => line.text).join('\n');
+    const beforeText = transcriptText.slice(0, startIndex);
+    const highlightedText = transcriptText.slice(startIndex, endIndex);
+    const afterText = transcriptText.slice(endIndex);
+
+    return (
+      <>
+        {beforeText}
+        <span className="highlighted-text">{highlightedText}</span>
+        {afterText}
+      </>
+    );
+  };
+
+  const handleFileOpen = (file: File) => {
+    const fileURL = URL.createObjectURL(file);
+    window.open(fileURL, '_blank');
   };
 
   return (
-    <div>
-      <h2>Transcript</h2>
-      <div onMouseUp={handleTextSelection}>
-        {transcript.map((line) => (
-          <p key={line.id} data-timestamp={line.timestamp}>
-            {line.text}
-          </p>
-        ))}
+    <div className="transcript-container">
+      <div className="transcript-content" ref={transcriptRef}>
+        <h3>Transcript</h3>
+        <div onMouseUp={handleTextSelection}>
+          {activeComment 
+            ? highlightText(comments.find(c => c.id === activeComment)?.startIndex || 0, 
+                            comments.find(c => c.id === activeComment)?.endIndex || 0)
+            : transcript.map((line) => (
+                <p key={line.id} data-timestamp={line.timestamp}>
+                  {line.text}
+                </p>
+              ))
+          }
+        </div>
+        {showCommentButton && (
+          <button
+            ref={commentButtonRef}
+            className="add-comment-button"
+            onClick={handleAddComment}
+          >
+            Add Comment
+          </button>
+        )}
       </div>
 
-      <div>
+      <div className="comments-sidebar">
         <h3>Comments</h3>
         {comments.map((comment) => (
-          <div key={comment.id}>
-            <p>
-              <strong>Timestamp: {comment.timestamp}s</strong>
-              <br />
-              {comment.text}
-            </p>
-            {comment.fileAttachment && (
-              <p>Attachment: {comment.fileAttachment.name}</p>
+          <div 
+            key={comment.id} 
+            className={`comment ${activeComment === comment.id ? 'active' : ''}`}
+            onClick={() => setActiveComment(comment.id)}
+          >
+            <p>{comment.text || <em>Add a comment...</em>}</p>
+            {activeComment === comment.id && (
+              <div className="comment-actions">
+                <textarea
+                  value={comment.text}
+                  onChange={(e) => handleEditComment(comment.id, e.target.value, comment.fileAttachment)}
+                  placeholder="Add a comment..."
+                />
+                <div className="button-group">
+                  <input
+                    type="file"
+                    id={`file-${comment.id}`}
+                    className="file-input"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleEditComment(comment.id, comment.text, e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <label htmlFor={`file-${comment.id}`} className="file-label">Choose File</label>
+                  <button className="delete-button" onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                </div>
+                {comment.fileAttachment && (
+                  <p className="attachment-info" onClick={() => handleFileOpen(comment.fileAttachment!)}>
+                    Attachment: {comment.fileAttachment.name}
+                  </p>
+                )}
+              </div>
             )}
-            <button onClick={() => handleEditComment(comment.id, prompt('Edit comment:', comment.text) || '')}>
-              Edit
-            </button>
-            <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
           </div>
         ))}
       </div>
 
-      <div>
-        <textarea
-          placeholder="Add a comment"
-          value={selectedText}
-          onChange={(e) => setSelectedText(e.target.value)}
-        />
-        <input
-          type="file"
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              handleAddComment(selectedText, selectedTimestamp || 0, e.target.files[0]);
-            }
-          }}
-        />
-        <button
-          onClick={() => {
-            if (selectedText && selectedTimestamp !== null) {
-              handleAddComment(selectedText, selectedTimestamp);
-              setSelectedText('');
-              setSelectedTimestamp(null);
-            }
-          }}
-        >
-          Add Comment
-        </button>
-      </div>
-
-      <div>
+      <div className="summary-section">
         <h3>Summary</h3>
         <p>{summary}</p>
       </div>
@@ -156,4 +209,4 @@ const Transcript: React.FC = () => {
   );
 };
 
-export default Transcript;
+export default Transcript; 
